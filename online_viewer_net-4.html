@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>iOS Privacy Screen Beta</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600;700&display=swap');
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+            background-color: #0c0d10; /* خلفية غامقة بحال الطابلو ديا الطوموبيل اللي موراك فالتصويرة */
+            color: #000000;
+            margin: 0; padding: 0;
+            user-select: none;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* حاوية الهاتف الخارجي لضمان التجربة المستقرة */
+        .phone-container {
+            width: 100%;
+            max-width: 430px; /* قياس آيفون برو ماكس */
+            background-color: #FAF9F6; /* اللون البيج الفاتح ديا الشاشة الأصلية */
+            min-height: 100vh;
+            position: relative;
+            box-shadow: 0 0 40px rgba(0,0,0,0.8);
+            padding-bottom: 30px;
+        }
+
+        /* الستايل ديا التلفون الصغير اللي وسط الشاشة */
+        .mockup-phone {
+            width: 190px;
+            height: 340px;
+            background: linear-gradient(to bottom, #f9a072, #2d5a27); /* الـ Wallpaper اللي فالتصويرة */
+            border: 10px solid #4a4a4a;
+            border-radius: 32px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            margin: 0 auto;
+        }
+
+        /* النوتش ديا التلفون الصغير */
+        .mockup-notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90px;
+            height: 18px;
+            background-color: #4a4a4a;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+            z-index: 40;
+        }
+
+        /* الـ Overlay السحري ديا الـ Privacy (شغال فقط داخل الهاتف الصغير) */
+        .privacy-lens {
+            position: absolute;
+            inset: 0;
+            background-color: #000000;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 30;
+            transition: opacity 0.08s ease-out;
+        }
+
+        /* بوطونة Start Demo بـ الـ Press Effect ديا آبل */
+        .btn-demo {
+            background-color: #111111;
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 16px;
+            padding: 16px;
+            border-radius: 9999px;
+            width: 90%;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            box-shadow: 0 10px 20px -5px rgba(0,0,0,0.3);
+        }
+        .btn-demo:active {
+            transform: scale(0.96);
+            background-color: #222222;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="phone-container flex flex-col justify-between">
+        
+        <div>
+            <div class="flex justify-between items-center px-6 pt-3 text-[14px] font-medium text-black">
+                <span>1:48</span>
+                <div class="flex items-center gap-1">
+                    <i class="ri-signal-tower-fill"></i>
+                    <i class="ri-wifi-line"></i>
+                    <i class="ri-battery-fill text-lg"></i>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center px-6 mt-4">
+                <button class="text-black text-xl"><i class="ri-arrow-left-s-line text-2xl"></i></button>
+                <span class="font-medium text-[16px] text-[#444]">Privacy Screen</span>
+                <button class="bg-[#1c1c1e] text-white text-[13px] font-semibold px-4 py-1.5 rounded-full">Edit</button>
+            </div>
+
+            <div class="text-center px-4 mt-6">
+                <h2 class="text-[25px] font-bold leading-tight tracking-tight text-[#111]">
+                    Discover how to enable<br>privacy screen feature<br>on iPhone
+                </h2>
+            </div>
+        </div>
+
+        <div class="my-6">
+            <div class="mockup-phone">
+                <div class="mockup-notch"></div>
+                
+                <div class="privacy-lens" id="innerLens"></div>
+                
+                <div class="absolute inset-0 flex flex-col justify-between p-3 pt-6 text-white text-center">
+                    <div class="flex justify-between text-[9px] opacity-80">
+                        <span>1:48</span>
+                        <span><i class="ri-battery-fill"></i></span>
+                    </div>
+                    
+                    <div class="mb-4 z-20 bg-black/30 backdrop-blur-sm rounded-xl py-2 px-1 w-[85%] mx-auto">
+                        <p class="text-[11px] font-bold tracking-wide" id="angleDisplay">Side angle 0°</p>
+                        <p class="text-[9px] opacity-90 mt-0.5" id="statusDisplay">Ready to preview</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <div class="px-8 text-left">
+                <div class="flex items-center gap-2 mb-2">
+                    <h3 class="text-[21px] font-bold text-black">Privacy Screen</h3>
+                    <span class="bg-[#E9E9EB] text-[#555] text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider">Beta</span>
+                </div>
+                <p class="text-[14px] text-gray-500 leading-relaxed font-normal">
+                    Helps keep your screen private by reducing side visibility while keeping the center view clear when the phone is held straight.
+                </p>
+                <p class="text-[12px] text-gray-400 mt-4 italic">
+                    Start the demo to test the full-screen privacy effect.
+                </p>
+            </div>
+
+            <div class="mt-8 mb-6 text-center">
+                <button class="btn-demo" id="startDemoBtn">
+                    Start Demo
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const startDemoBtn = document.getElementById('startDemoBtn');
+        const innerLens = document.getElementById('innerLens');
+        const angleDisplay = document.getElementById('angleDisplay');
+        const statusDisplay = document.getElementById('statusDisplay');
+        
+        let isDemoActive = false;
+
+        startDemoBtn.addEventListener('click', () => {
+            if (!isDemoActive) {
+                // طلب الصلاحية على الـ iOS
+                if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                    DeviceOrientationEvent.requestPermission()
+                        .then(permissionState => {
+                            if (permissionState === 'granted') {
+                                activatePrivacyEngine();
+                            } else {
+                                alert("Permission denied! Sensor access is required for Parallax.");
+                            }
+                        })
+                        .catch(console.error);
+                } else {
+                    // أندرويد والبيكسل دياك نيشان
+                    activatePrivacyEngine();
+                }
+            } else {
+                deactivatePrivacyEngine();
+            }
+        });
+
+        function activatePrivacyEngine() {
+            isDemoActive = true;
+            startDemoBtn.textContent = "Stop Demo";
+            startDemoBtn.style.backgroundColor = "#FF3B30"; // كتحول حمرا ملي كيبدا التيست
+            window.addEventListener('deviceorientation', processOrientation);
+        }
+
+        function deactivatePrivacyEngine() {
+            isDemoActive = false;
+            startDemoBtn.textContent = "Start Demo";
+            startDemoBtn.style.backgroundColor = "#111111";
+            window.removeEventListener('deviceorientation', processOrientation);
+            innerLens.style.opacity = 0;
+            angleDisplay.textContent = "Side angle 0°";
+            statusDisplay.textContent = "Ready to preview";
+        }
+
+        function processOrientation(event) {
+            if (!isDemoActive) return;
+
+            // الحساب على حساب الـ Gamma (الميلان يمين/يسار)
+            let tiltX = event.gamma; 
+            let absoluteTilt = Math.abs(tiltX);
+
+            // تحديث الأرقام وسط الشاشة الصغيرة لايف بحال الديزاين دياك
+            angleDisplay.textContent = `Side angle ${Math.round(absoluteTilt)}°`;
+
+            // حساب نسبة الشفافية ديا الكحولية
+            let opacity = 0;
+            if (absoluteTilt > 8) {
+                opacity = (absoluteTilt - 8) / 22; // كيبدا يغماق من بعد 8 درجات وكيكحال تماما فـ 30 درجة
+                statusDisplay.textContent = "Privacy Active 🛡️";
+            } else {
+                statusDisplay.textContent = "Center View Clear";
+            }
+
+            if (opacity > 0.98) opacity = 0.98; // كيبقاو يبانو غير العناوين بزز
+            
+            innerLens.style.opacity = opacity;
+        }
+    </script>
+</body>
+</html>
